@@ -2,6 +2,8 @@
 
 > **"Not your keys, not your data. Not your file, not your context."**
 
+[![PyPI version](https://img.shields.io/pypi/v/vaultd.svg)](https://pypi.org/project/vaultd/)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/vaultd.svg)](https://pypi.org/project/vaultd/)
 [![License: CC0-1.0](https://img.shields.io/badge/License-CC0_1.0-lightgrey.svg)](https://creativecommons.org/publicdomain/zero/1.0/)
 [![Format version: 1.2](https://img.shields.io/badge/format-v1.2-00D4FF)]()
 [![CI](https://github.com/Davincc77/vaultd/actions/workflows/ci.yml/badge.svg)](https://github.com/Davincc77/vaultd/actions/workflows/ci.yml)
