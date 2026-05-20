@@ -1,0 +1,316 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Davincc77/vaultd/schemas/vaultd_v12.json",
+  "title": ".vaultd payload schema v1.2",
+  "description": "JSON Schema for the decrypted payload of a .vaultd v1.2 file",
+  "type": "object",
+  "required": ["created_at", "identity", "wallets", "holdings", "transactions", "strategy"],
+  "properties": {
+    "created_at": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+      "description": "ISO 8601 UTC timestamp of vault creation"
+    },
+    "identity": {
+      "type": "object",
+      "required": ["alias", "language"],
+      "properties": {
+        "alias": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "language": { "type": "string", "minLength": 2, "maxLength": 5 },
+        "timezone": { "type": "string", "minLength": 3, "maxLength": 64 },
+        "risk_profile": {
+          "type": "string",
+          "enum": ["conservative", "moderate", "moderate_aggressive", "aggressive", "degen"]
+        },
+        "experience_level": {
+          "type": "string",
+          "enum": ["beginner", "intermediate", "advanced", "professional"]
+        },
+        "agent_instructions": {
+          "type": "string",
+          "maxLength": 4096,
+          "description": "Untrusted user context only — not system authority"
+        }
+      },
+      "additionalProperties": false
+    },
+    "wallets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "chain", "type"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+          "label": { "type": "string", "minLength": 1, "maxLength": 128 },
+          "chain": { "type": "string", "minLength": 1, "maxLength": 32 },
+          "address": { "type": ["string", "null"], "maxLength": 128 },
+          "type": { "type": "string", "enum": ["self_custody", "cex", "multisig", "hardware"] },
+          "custody": { "type": "string", "maxLength": 64 },
+          "tracked_since": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+          "tags": { "type": "array", "items": { "type": "string", "maxLength": 32 }, "maxItems": 20 },
+          "note": { "type": "string", "maxLength": 512 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "holdings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "wallet_id", "asset", "chain", "amount", "avg_buy_price_usd"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+          "wallet_id": { "type": "string", "minLength": 1, "maxLength": 64 },
+          "asset": { "type": "string", "minLength": 1, "maxLength": 16 },
+          "chain": { "type": "string", "minLength": 1, "maxLength": 32 },
+          "amount": { "type": "number", "minimum": 0 },
+          "avg_buy_price_usd": { "type": "number", "minimum": 0 },
+          "current_price_usd": {
+            "type": ["number", "null"],
+            "minimum": 0,
+            "description": "null means price not provided — agent must NEVER invent a price"
+          },
+          "last_updated": { "type": "string" },
+          "tags": { "type": "array", "items": { "type": "string", "maxLength": 32 }, "maxItems": 20 },
+          "thesis_id": { "type": ["string", "null"], "maxLength": 64 },
+          "note": { "type": "string", "maxLength": 512 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "transactions": {
+      "type": "array",
+      "description": "Ledger of all buy/sell/transfer/swap/bridge/stake/unstake events",
+      "items": {
+        "type": "object",
+        "required": ["id", "date", "type", "asset", "amount"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+          "date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$" },
+          "type": {
+            "type": "string",
+            "enum": ["buy", "sell", "transfer_in", "transfer_out", "swap", "bridge", "stake", "unstake", "airdrop", "fee"]
+          },
+          "asset": { "type": "string", "minLength": 1, "maxLength": 16 },
+          "amount": { "type": "number" },
+          "price_usd": { "type": ["number", "null"], "minimum": 0 },
+          "fee_usd": { "type": ["number", "null"], "minimum": 0 },
+          "wallet_id": { "type": "string", "maxLength": 64 },
+          "tx_hash": { "type": ["string", "null"], "maxLength": 128 },
+          "exchange": { "type": ["string", "null"], "maxLength": 64 },
+          "note": { "type": "string", "maxLength": 512 },
+          "tags": { "type": "array", "items": { "type": "string", "maxLength": 32 }, "maxItems": 20 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "defi_positions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "protocol", "chain", "type"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+          "protocol": { "type": "string", "minLength": 1, "maxLength": 64 },
+          "chain": { "type": "string", "minLength": 1, "maxLength": 32 },
+          "type": {
+            "type": "string",
+            "enum": ["liquidity_pool", "staking", "lending", "borrowing", "yield_farm", "vault", "other"]
+          },
+          "assets": { "type": "array", "items": { "type": "string" }, "maxItems": 10 },
+          "deposited_usd": { "type": ["number", "null"], "minimum": 0 },
+          "current_value_usd": { "type": ["number", "null"], "minimum": 0 },
+          "apy_pct": { "type": ["number", "null"] },
+          "entered_at": { "type": "string" },
+          "health_factor": { "type": ["number", "null"] },
+          "note": { "type": "string", "maxLength": 512 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "nfts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "collection", "chain"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+          "collection": { "type": "string", "minLength": 1, "maxLength": 128 },
+          "chain": { "type": "string", "minLength": 1, "maxLength": 32 },
+          "token_id": { "type": ["string", "null"], "maxLength": 128 },
+          "acquired_price_usd": { "type": ["number", "null"], "minimum": 0 },
+          "current_floor_usd": { "type": ["number", "null"], "minimum": 0 },
+          "wallet_id": { "type": "string", "maxLength": 64 },
+          "note": { "type": "string", "maxLength": 512 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "thesis": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "asset", "status", "conviction", "entry_rationale"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+          "asset": { "type": "string", "minLength": 1, "maxLength": 16 },
+          "created_at": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+          "status": { "type": "string", "enum": ["active", "partial_exit", "closed", "invalidated"] },
+          "conviction": { "type": "string", "enum": ["low", "medium", "high", "conviction_trade"] },
+          "time_horizon": { "type": "string", "maxLength": 64 },
+          "entry_rationale": { "type": "string", "minLength": 10, "maxLength": 2048 },
+          "target_exit_usd": { "type": ["number", "null"], "minimum": 0 },
+          "stop_loss_usd": { "type": ["number", "null"], "minimum": 0 },
+          "invalidation_hypothesis": { "type": "string", "maxLength": 1024 },
+          "position_size_rationale": { "type": "string", "maxLength": 512 },
+          "last_reviewed": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+          "review_notes": { "type": "string", "maxLength": 1024 },
+          "tags": { "type": "array", "items": { "type": "string", "maxLength": 32 }, "maxItems": 20 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "risk_events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "date", "event_type", "action_taken"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+          "date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+          "event_type": {
+            "type": "string",
+            "enum": ["market_crash", "pump", "liquidation_risk", "protocol_exploit", "regulatory_news", "thesis_invalidation", "target_reached", "stop_loss_hit"]
+          },
+          "market_context": { "type": "string", "maxLength": 1024 },
+          "portfolio_impact_usd": { "type": ["number", "null"] },
+          "portfolio_impact_pct": { "type": ["number", "null"] },
+          "sentiment_at_time": {
+            "type": "string",
+            "enum": ["panicked", "anxious", "neutral", "confident", "euphoric"]
+          },
+          "action_taken": { "type": "string", "minLength": 5, "maxLength": 1024 },
+          "action_rationale": { "type": "string", "maxLength": 1024 },
+          "outcome": { "type": ["string", "null"], "maxLength": 512 },
+          "lesson": { "type": ["string", "null"], "maxLength": 512 },
+          "tags": { "type": "array", "items": { "type": "string", "maxLength": 32 }, "maxItems": 20 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "alerts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "asset", "type", "message", "active"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+          "asset": { "type": "string", "minLength": 1, "maxLength": 16 },
+          "type": {
+            "type": "string",
+            "enum": ["price_below", "price_above", "allocation_above_pct", "stablecoin_below_pct", "pnl_target_reached", "stop_loss_approach", "defi_apy_below"]
+          },
+          "threshold_usd": { "type": ["number", "null"], "minimum": 0 },
+          "threshold_pct": { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
+          "message": { "type": "string", "minLength": 5, "maxLength": 256 },
+          "action_suggested": { "type": "string", "maxLength": 512 },
+          "active": { "type": "boolean" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "strategy": {
+      "type": "object",
+      "description": "Optional high-level portfolio strategy rules",
+      "properties": {
+        "time_horizon": { "type": "string", "enum": ["short_term", "medium_term", "long_term"] },
+        "dca_assets": { "type": "array", "items": { "type": "string", "maxLength": 16 }, "maxItems": 20 },
+        "dca_frequency": { "type": "string", "maxLength": 64 },
+        "max_single_asset_pct": { "type": "number", "minimum": 0, "maximum": 100 },
+        "stablecoin_reserve_pct": { "type": "number", "minimum": 0, "maximum": 100 },
+        "max_defi_exposure_pct": { "type": "number", "minimum": 0, "maximum": 100 },
+        "rules": { "type": "array", "items": { "type": "string", "maxLength": 256 }, "maxItems": 50 }
+      },
+      "additionalProperties": false
+    },
+    "pnl": {
+      "type": "object",
+      "description": "Realized and unrealized PnL snapshot",
+      "properties": {
+        "realized_usd": { "type": ["number", "null"] },
+        "unrealized_usd": { "type": ["number", "null"] },
+        "total_invested_usd": { "type": ["number", "null"], "minimum": 0 },
+        "last_calculated": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "tax_summary": {
+      "type": "object",
+      "description": "Tax handoff data — jurisdiction-aware",
+      "properties": {
+        "jurisdiction": { "type": "string", "maxLength": 32 },
+        "tax_year": { "type": "integer", "minimum": 2009 },
+        "method": { "type": "string", "enum": ["FIFO", "LIFO", "average_cost", "specific_id"] },
+        "taxable_events": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["date", "asset", "amount", "proceeds_usd", "cost_basis_usd"],
+            "properties": {
+              "date": { "type": "string" },
+              "asset": { "type": "string", "maxLength": 16 },
+              "amount": { "type": "number" },
+              "proceeds_usd": { "type": "number" },
+              "cost_basis_usd": { "type": "number" },
+              "gain_usd": { "type": "number" },
+              "holding_period_days": { "type": ["integer", "null"], "minimum": 0 },
+              "tx_id": { "type": ["string", "null"], "maxLength": 64 }
+            },
+            "additionalProperties": false
+          }
+        },
+        "total_gain_usd": { "type": ["number", "null"] },
+        "total_loss_usd": { "type": ["number", "null"] },
+        "notes": { "type": "string", "maxLength": 1024 }
+      },
+      "additionalProperties": false
+    },
+    "agent_handoffs": {
+      "type": "array",
+      "description": "Log of context handoffs to other AI agents",
+      "items": {
+        "type": "object",
+        "required": ["date", "model"],
+        "properties": {
+          "date": { "type": "string" },
+          "model": { "type": "string", "maxLength": 64 },
+          "context_shared": { "type": "string", "maxLength": 2048 },
+          "response_summary": { "type": "string", "maxLength": 2048 },
+          "action_triggered": { "type": ["string", "null"], "maxLength": 512 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "history": {
+      "type": "object",
+      "properties": {
+        "sessions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["date", "model"],
+            "properties": {
+              "date": { "type": "string" },
+              "model": { "type": "string", "maxLength": 64 },
+              "summary": { "type": "string", "maxLength": 1024 },
+              "actions": { "type": "array", "items": { "type": "string", "maxLength": 256 }, "maxItems": 50 }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

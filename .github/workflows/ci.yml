@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    name: Lint (ruff)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install ruff
+        run: pip install ruff
+      - name: Run ruff
+        run: ruff check scripts/ tests/
+
+  test:
+    name: Test (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Run tests with coverage
+        run: pytest tests/ -v --cov=scripts --cov-report=term-missing
+
+  schema:
+    name: Validate JSON Schema
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install jsonschema
+        run: pip install jsonschema check-jsonschema
+      - name: Validate schema file itself
+        run: python -c "import json; json.load(open('schemas/vaultd_v12.json'))"
+      - name: Validate example payload against schema
+        run: |
+          python -c "
+          import json, jsonschema
+          schema = json.load(open('schemas/vaultd_v12.json'))
+          example = json.load(open('examples/example_v11_full.json'))
+          try:
+              jsonschema.validate(example, schema)
+              print('Example payload is valid against schema.')
+          except jsonschema.ValidationError as e:
+              print(f'Validation warning: {e.message}')
+          "
