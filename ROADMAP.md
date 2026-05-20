@@ -125,7 +125,7 @@ Read and review your vault on mobile. Propose edits from your phone. Never sync 
 
 Schema changes and major feature additions follow a lightweight RFC process:
 
-1. A draft RFC is posted to [GitHub Discussions](https://github.com/Davincc77/vaultd/discussions)
+1. A draft RFC is posted to [GitHub Discussions](https://github.com/Davincc77/vaultd/discussions/1)
 2. **Breaking schema changes require a minimum 2-week public comment period** before any merge
 3. Non-breaking additions can ship with a single-week comment window
 4. The RFC is merged into `/docs/rfcs/` when accepted, or closed with a documented reason if rejected
@@ -133,7 +133,7 @@ Schema changes and major feature additions follow a lightweight RFC process:
 This exists to keep `.vaultd` an open standard that the community can build on, not a format that shifts under third-party implementations without warning.
 
 **Open threads:**
-- [RFC-001: v2.5–v3.5 Roadmap](https://github.com/Davincc77/vaultd/discussions) — open for input now
+- [RFC-001: v2.5–v3.5 Roadmap](https://github.com/Davincc77/vaultd/discussions/1) — open for input now
 
 ---
 
