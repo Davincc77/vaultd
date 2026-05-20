@@ -4,7 +4,7 @@
   "title": ".vaultd payload schema v1.2",
   "description": "JSON Schema for the decrypted payload of a .vaultd v1.2 file",
   "type": "object",
-  "required": ["created_at", "identity", "wallets", "holdings", "transactions", "strategy"],
+  "required": ["created_at", "identity", "wallets", "holdings", "transactions"],
   "properties": {
     "created_at": {
       "type": "string",
