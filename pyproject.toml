@@ -5,11 +5,16 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "vaultd"
 version = "2.5.0"
-description = "AES-256-GCM + Argon2id encrypted crypto portfolio context for AI agents"
+description = "Local-first, encrypted crypto portfolio tracker with AI agent integration. AES-256-GCM + Argon2id. Zero server. Import from Coinbase, Etherscan, Solscan, Binance, Kraken."
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.10"
-keywords = ["crypto", "portfolio", "encryption", "argon2", "aes-gcm", "ai", "privacy"]
+keywords = [
+    "crypto", "portfolio", "encryption", "argon2", "aes-gcm", "ai", "privacy",
+    "bitcoin", "ethereum", "solana", "defi", "wallet", "local-first",
+    "coinbase", "binance", "kraken", "solscan", "etherscan",
+    "investment", "thesis", "tax", "pnl"
+]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Environment :: Console",

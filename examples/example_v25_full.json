@@ -1,0 +1,334 @@
+{
+  "vaultd_version": "1.2",
+  "created_at": "2026-05-20T12:00:00Z",
+  "identity": {
+    "alias": "Vince",
+    "language": "en",
+    "timezone": "Europe/Luxembourg",
+    "risk_profile": "moderate_aggressive",
+    "experience_level": "advanced",
+    "agent_instructions": "You are my crypto portfolio manager. Respond in English. Always state my thesis before any position comment. Flag any action that violates my strategy rules. Never invent a price."
+  },
+  "wallets": [
+    {
+      "id": "wallet-coinbase",
+      "label": "Coinbase — Main",
+      "chain": "ethereum",
+      "address": "0xABCDEF1234567890abcdef1234567890ABCDEF12",
+      "type": "custodial",
+      "custody": "coinbase",
+      "tracked_since": "2024-01-01",
+      "tags": ["cex", "eth", "btc"],
+      "note": ""
+    },
+    {
+      "id": "wallet-sol-main",
+      "label": "Solana — Phantom",
+      "chain": "solana",
+      "address": "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAs",
+      "type": "self_custody",
+      "custody": "phantom",
+      "tracked_since": "2024-06-01",
+      "tags": ["solana", "defi"],
+      "note": ""
+    },
+    {
+      "id": "wallet-kraken",
+      "label": "Kraken Exchange",
+      "chain": "off-chain",
+      "address": "",
+      "type": "custodial",
+      "custody": "kraken",
+      "tracked_since": "2025-01-01",
+      "tags": ["cex", "staking"],
+      "note": ""
+    }
+  ],
+  "holdings": [
+    {
+      "id": "hold-eth-001",
+      "wallet_id": "wallet-coinbase",
+      "asset": "ETH",
+      "chain": "ethereum",
+      "amount": 2.75,
+      "avg_buy_price_usd": 2850.00,
+      "current_price_usd": null,
+      "last_updated": "2026-05-20T09:00:00Z",
+      "tags": ["layer1", "long_term", "dca"],
+      "thesis_id": "thesis-eth-001",
+      "note": "Core holding — DCA monthly"
+    },
+    {
+      "id": "hold-sol-001",
+      "wallet_id": "wallet-sol-main",
+      "asset": "SOL",
+      "chain": "solana",
+      "amount": 42.5,
+      "avg_buy_price_usd": 128.00,
+      "current_price_usd": null,
+      "last_updated": "2026-05-20T09:00:00Z",
+      "tags": ["layer1", "solana"],
+      "thesis_id": "thesis-sol-001",
+      "note": "Accumulated via Solscan import"
+    },
+    {
+      "id": "hold-btc-001",
+      "wallet_id": "wallet-kraken",
+      "asset": "BTC",
+      "chain": "bitcoin",
+      "amount": 0.12,
+      "avg_buy_price_usd": 58000.00,
+      "current_price_usd": null,
+      "last_updated": "2026-05-20T09:00:00Z",
+      "tags": ["layer1", "long_term", "kraken"],
+      "thesis_id": "thesis-btc-001",
+      "note": "Bought via Kraken — staking rewards compounding"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "a1b2c3d4e5f6a7b8",
+      "wallet_id": "wallet-coinbase",
+      "date": "2024-03-15T10:30:00Z",
+      "type": "buy",
+      "asset": "ETH",
+      "amount": 1.0,
+      "price_usd": 3100.00,
+      "fee_usd": 4.65,
+      "chain": "ethereum",
+      "tx_hash": null,
+      "exchange": "coinbase",
+      "thesis_id": "thesis-eth-001",
+      "note": "DCA March 2024",
+      "tags": ["imported", "coinbase", "dca"]
+    },
+    {
+      "id": "b2c3d4e5f6a7b8c9",
+      "wallet_id": "wallet-sol-main",
+      "date": "2024-06-01T12:00:00Z",
+      "type": "transfer_in",
+      "asset": "SOL",
+      "amount": 20.0,
+      "price_usd": null,
+      "fee_usd": null,
+      "chain": "solana",
+      "tx_hash": "5UfDuX2rQHwbBkpvAyBzkJ8mK9nNpLqRsT3vW4xY6zA",
+      "exchange": "solscan",
+      "thesis_id": null,
+      "note": "",
+      "tags": ["imported", "solscan", "sol"]
+    },
+    {
+      "id": "c3d4e5f6a7b8c9d0",
+      "wallet_id": "wallet-kraken",
+      "date": "2025-01-10T11:00:00Z",
+      "type": "buy",
+      "asset": "BTC",
+      "amount": 0.05,
+      "price_usd": 58000.00,
+      "fee_usd": 2.90,
+      "chain": "bitcoin",
+      "tx_hash": "LKRAKEN001",
+      "exchange": "kraken",
+      "thesis_id": "thesis-btc-001",
+      "note": "pair: XXBTZEUR",
+      "tags": ["imported", "kraken", "trade"]
+    },
+    {
+      "id": "d4e5f6a7b8c9d0e1",
+      "wallet_id": "wallet-coinbase",
+      "date": "2025-03-10T09:00:00Z",
+      "type": "buy",
+      "asset": "ETH",
+      "amount": 0.75,
+      "price_usd": 2600.00,
+      "fee_usd": 2.93,
+      "chain": "ethereum",
+      "tx_hash": null,
+      "exchange": "binance",
+      "thesis_id": "thesis-eth-001",
+      "note": "pair: ETHUSDT",
+      "tags": ["imported", "binance", "trade"]
+    },
+    {
+      "id": "e5f6a7b8c9d0e1f2",
+      "wallet_id": "wallet-kraken",
+      "date": "2025-06-01T00:00:00Z",
+      "type": "claim_rewards",
+      "asset": "ETH",
+      "amount": 0.0015,
+      "price_usd": null,
+      "fee_usd": null,
+      "chain": "ethereum",
+      "tx_hash": "LSTAKE-KRAKEN-001",
+      "exchange": "kraken",
+      "thesis_id": null,
+      "note": "type: staking, subtype: , fee: 0.0 ETH",
+      "tags": ["imported", "kraken", "staking"]
+    }
+  ],
+  "thesis": [
+    {
+      "id": "thesis-eth-001",
+      "asset": "ETH",
+      "created_at": "2024-01-01",
+      "status": "active",
+      "conviction": "high",
+      "time_horizon": "18_months",
+      "entry_rationale": "L2 flywheel acceleration (Base, Arbitrum, Optimism). EIP-4844 reduces blob costs. Fee burn maintains deflationary pressure. Main catalyst: spot ETH ETF approval Q1 2026.",
+      "target_exit_usd": 6000.00,
+      "stop_loss_usd": 1800.00,
+      "invalidation_hypothesis": "If L2s migrate massively to an alternative DA layer (Celestia, EigenDA) and ETH fees collapse durably below 500k/day.",
+      "position_size_rationale": "25% of portfolio — core holding. Monthly DCA up to 2% of portfolio/month.",
+      "last_reviewed": "2026-05-01",
+      "review_notes": "ETF approved. Thesis holds. Next catalyst: staking ETF.",
+      "tags": ["layer1", "macro", "dca"]
+    },
+    {
+      "id": "thesis-sol-001",
+      "asset": "SOL",
+      "created_at": "2024-06-01",
+      "status": "active",
+      "conviction": "medium",
+      "time_horizon": "12_months",
+      "entry_rationale": "Strong ecosystem growth. Meme coin flywheel brings liquidity. High TPS + low fees attract retail. DePIN narrative.",
+      "target_exit_usd": 300.00,
+      "stop_loss_usd": 80.00,
+      "invalidation_hypothesis": "If validator centralization leads to a major outage or regulatory action targets Solana specifically.",
+      "position_size_rationale": "10% of portfolio max.",
+      "last_reviewed": "2026-04-15",
+      "review_notes": "Ecosystem strong. ETF speculation growing. Thesis intact.",
+      "tags": ["layer1", "solana"]
+    },
+    {
+      "id": "thesis-btc-001",
+      "asset": "BTC",
+      "created_at": "2025-01-01",
+      "status": "active",
+      "conviction": "high",
+      "time_horizon": "24_months",
+      "entry_rationale": "Post-halving supply shock. Institutional inflows via spot ETF. Digital gold narrative reinforced by macro uncertainty.",
+      "target_exit_usd": 120000.00,
+      "stop_loss_usd": 40000.00,
+      "invalidation_hypothesis": "If a major nation-state successfully bans BTC mining/holding with enforcement, or if a critical cryptographic flaw is discovered.",
+      "position_size_rationale": "20% of portfolio — macro hedge.",
+      "last_reviewed": "2026-05-01",
+      "review_notes": "Post-halving cycle on track. Thesis intact.",
+      "tags": ["layer1", "macro", "store-of-value"]
+    }
+  ],
+  "defi_positions": [],
+  "nfts": [],
+  "risk_events": [],
+  "alerts": [
+    {
+      "id": "alert-eth-low",
+      "asset": "ETH",
+      "type": "price_below",
+      "threshold_usd": 2500.00,
+      "message": "ETH below $2500 — consider additional DCA if thesis intact",
+      "action_suggested": "dca_opportunity",
+      "active": true
+    },
+    {
+      "id": "alert-eth-target",
+      "asset": "ETH",
+      "type": "price_above",
+      "threshold_usd": 5500.00,
+      "message": "ETH approaching target. Evaluate 25% partial exit.",
+      "action_suggested": "partial_exit",
+      "active": true
+    },
+    {
+      "id": "alert-stablecoin",
+      "asset": "portfolio",
+      "type": "stablecoin_below_pct",
+      "threshold_pct": 10.0,
+      "message": "Stablecoin reserve below 10%. Rebalance.",
+      "action_suggested": "rebalance",
+      "active": true
+    }
+  ],
+  "tax_summary": {
+    "tax_year": 2026,
+    "jurisdiction": "LU",
+    "currency": "EUR",
+    "disclaimer": "Indicative summary only. Consult a licensed accountant for official filing.",
+    "realized_gains_usd": 0.0,
+    "realized_losses_usd": 0.0,
+    "net_realized_usd": 0.0,
+    "total_fees_usd": 10.48,
+    "taxable_events_count": 0,
+    "taxable_events": [],
+    "last_calculated": "2026-05-20"
+  },
+  "agent_handoffs": [],
+  "pnl": {
+    "realized_usd": 0.0,
+    "unrealized_usd": null,
+    "total_fees_paid_usd": 10.48,
+    "best_trade": null,
+    "worst_trade": null,
+    "last_calculated": "2026-05-20T09:00:00Z"
+  },
+  "watchlist": [
+    {
+      "asset": "MATIC",
+      "chain": "polygon",
+      "interest": "potential_entry",
+      "target_entry_usd": 0.40,
+      "max_allocation_pct": 3.0,
+      "thesis_draft": "Polygon zkEVM gaining traction. POL migration complete. Wait for consolidation.",
+      "conviction": "low",
+      "note": "On watch — no entry yet"
+    }
+  ],
+  "strategy": {
+    "time_horizon": "long_term",
+    "dca_assets": ["ETH", "BTC"],
+    "dca_frequency": "monthly",
+    "max_single_asset_pct": 25,
+    "stablecoin_reserve_pct": 15,
+    "max_defi_exposure_pct": 20,
+    "rules": [
+      "Never invest more than 25% of portfolio in a single asset",
+      "Always keep 15% in stablecoins",
+      "DCA only on ETH and BTC in bear markets",
+      "Take 25% profits when a position doubles",
+      "Never chase a pump — entry only on pre-established plan",
+      "Always check thesis before any sell decision"
+    ]
+  },
+  "journal": [
+    {
+      "id": "journal-001",
+      "date": "2026-05-20T12:00:00Z",
+      "title": "vaultd v2.5 — first multi-source import",
+      "content": "Imported transactions from Coinbase, Solscan (Phantom wallet), Kraken, and Binance. 87 tests passing. Portfolio context fully unified in one file.",
+      "tags": ["setup", "import"],
+      "sentiment": "optimistic"
+    }
+  ],
+  "history": {
+    "enabled": true,
+    "sessions": [
+      {
+        "session_id": "sess-001",
+        "date": "2026-05-20",
+        "agent": "perplexity_computer",
+        "summary": "Initial vault creation. Imported transactions from 4 sources (Coinbase, Solscan, Binance, Kraken). 3 theses created. Alerts configured.",
+        "actions_taken": [
+          "created vault",
+          "imported coinbase transactions",
+          "imported solscan transactions",
+          "imported binance transactions",
+          "imported kraken transactions",
+          "added thesis-eth-001",
+          "added thesis-sol-001",
+          "added thesis-btc-001"
+        ],
+        "alerts_triggered": []
+      }
+    ]
+  }
+}

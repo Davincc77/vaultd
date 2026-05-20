@@ -1,6 +1,6 @@
 # vaultd Roadmap
 
-> Last updated: June 2025 — v2.1.0 stable
+> Last updated: May 2026 — v2.5.0 stable
 
 This document describes where vaultd is today, where it is going, and the values that govern every decision along the way. It is a living document. If something here conflicts with reality, open an issue.
 
@@ -27,10 +27,10 @@ Shipped and stable:
 | Encryption | AES-256-GCM + Argon2id — `.vaultd` format |
 | Schema | v1.2.1, strict (`additionalProperties: false`) |
 | CLI commands | `vaultd-save`, `vaultd-load`, `vaultd-import`, `vaultd-price`, `vaultd-tui` |
-| Importers | Coinbase CSV, Etherscan (normal txns + ERC-20 transfers) |
+| Importers | Coinbase, Etherscan (normal + ERC-20), **Solscan**, **Binance**, **Kraken** |
 | Price oracle | CoinGecko free tier, 5-min cache, confirmation-required writes |
 | TUI | Textual, 6 tabs, dark theme |
-| CI | GitHub Actions, Python 3.10–3.13, 60 tests |
+| CI | GitHub Actions, Python 3.10–3.13, **87 tests** |
 
 ---
 
@@ -40,26 +40,21 @@ Milestones are ordered by dependency and community priority. Dates are targets, 
 
 ---
 
-### v2.5 — Unified Multi-Chain Importers
-**Target: Q3 2026**
+### ~~v2.5 — Unified Multi-Chain Importers~~ ✅ SHIPPED
+**Released: May 2026**
 
-The single biggest friction point: your portfolio spans five chains and six exchanges, and vaultd only understands two of them.
+- ✅ Solscan importer (SOL + SPL token transfers)
+- ✅ Binance importer (trade history / transaction history / deposit-withdrawal)
+- ✅ Kraken importer (ledger + trade exports, asset normalization)
+- ✅ 87 tests, all passing
+- ✅ `pip install vaultd` — all importers included
 
-**Planned work:**
+**Remaining from original v2.5 scope (moved to v2.6):**
+- `vaultd import --all` — batch from multiple configured sources
+- Background watcher mode — `vaultd watch` polls a directory for new CSVs
+- Exchange API connectors (read-only) — Coinbase Advanced Trade, Binance
 
-- **Solscan importer** — Solana transactions and SPL token transfers
-- **Binance CSV importer** — trade history and deposit/withdrawal exports
-- **Kraken CSV importer** — trade history, staking rewards, and ledger exports
-- **`vaultd import --all`** — batch import from multiple configured sources in a single command
-- **Background watcher mode** — `vaultd watch --vault portfolio.vaultd` polls a directory for new CSVs and proposes imports with confirmation
-- **Exchange API connectors (optional, read-only)** — Coinbase Advanced Trade API, Binance API; keys stored encrypted in vault, never transmitted elsewhere
-
-**Install:**
-```
-pip install 'vaultd[importers]'
-```
-
-**RFC:** [RFC-001](RFC-001-roadmap.md) — community input open now
+**RFC:** [RFC-001](RFC-001-roadmap.md) — community input open
 
 ---
 

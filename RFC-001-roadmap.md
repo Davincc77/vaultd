@@ -76,8 +76,6 @@ Planned additions:
 - **Background watcher mode** — `vaultd watch --vault portfolio.vaultd` monitors a directory and proposes imports as new CSVs appear
 - **Exchange API connectors (optional, read-only)** — Coinbase Advanced Trade, Binance API; keys stored in vault, never sent anywhere
 
-Available as: `pip install 'vaultd[importers]'`
-
 ---
 
 ### v2.8 — Private Tax Auditor Mode (Q3 2026)
@@ -131,13 +129,12 @@ These are the decisions where outside perspective genuinely changes the outcome.
 
 ### 1. Which importer do you need most?
 
-After Coinbase and Etherscan, what's your biggest gap?
+Solscan, Binance, and Kraken are live in v2.5. What's your biggest remaining gap?
 
-- Solana (Solscan / native transactions)
-- Binance CSV
-- Kraken CSV
-- MetaMask (transaction history export)
+- MetaMask transaction history export
 - Ledger Live CSV export
+- OKX / Bybit CSV
+- Gate.io CSV
 - Something else — tell us what
 
 ### 2. Tax jurisdiction priority

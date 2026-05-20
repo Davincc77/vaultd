@@ -125,7 +125,7 @@ The same `.vaultd` + `SKILL.md` pair works safely with Claude, Grok, GPT, Gemini
 | Encryption | AES-256-GCM |
 | Key derivation | Argon2id — configurable m/t/p, default m=65536/t=3/p=1 |
 | AAD canonicalization | RFC 8785 JCS — 5 fields, deterministic |
-| Schema | `vaultd_v12.json` — `additionalProperties: false`, ID patterns, enums, length constraints |
+| Schema | `vaultd_v121.json` — `additionalProperties: false`, ID patterns, enums, length constraints |
 | Envelope | Based on `.klickd` v3.0 |
 | License | CC0 1.0 Universal (public domain) |
 | SDK required | None |
@@ -144,26 +144,73 @@ The same `.vaultd` + `SKILL.md` pair works safely with Claude, Grok, GPT, Gemini
 | AI guardrails | Weak / none | ✅ Deeply embedded in SKILL.md |
 | Session memory + audit | Basic | ✅ Full history + ritual on every open |
 | Zero server | Varies | ✅ By design |
+| Multi-exchange import | ❌ | ✅ Coinbase, Etherscan, Solscan, Binance, Kraken |
 
 ---
 
 ## Quickstart
 
 ```bash
-# Install
-pip install cryptography argon2-cffi jsonschema
+# Install core
+pip install vaultd
 
-# Or with entry points (after pip install -e .)
-vaultd-save --payload examples/example_v11_full.json --output portfolio.vaultd
+# Install with TUI (terminal interface)
+pip install 'vaultd[tui]'
+
+# Save an encrypted vault
+vaultd-save --payload examples/example_v25_full.json --output portfolio.vaultd
+
+# Load / inspect
 vaultd-load portfolio.vaultd
+vaultd-load portfolio.vaultd --json
+vaultd-load portfolio.vaultd --output decrypted.json
 
-# Direct scripts
-python scripts/save_vaultd.py --payload examples/example_v11_full.json --output portfolio.vaultd
-python scripts/load_vaultd.py portfolio.vaultd
+# Import transactions from exchanges
+vaultd-import coinbase export.csv --vault portfolio.vaultd --wallet-id coinbase-main
+vaultd-import etherscan txns.csv --vault portfolio.vaultd --wallet-address 0xabc...
+vaultd-import solscan txns.csv --vault portfolio.vaultd --wallet-id sol-main
+vaultd-import binance trades.csv --vault portfolio.vaultd --wallet-id binance
+vaultd-import kraken ledger.csv --vault portfolio.vaultd --wallet-id kraken-main
+
+# Dry-run any import before writing
+vaultd-import coinbase export.csv --vault portfolio.vaultd --dry-run
+
+# Fetch and preview live prices (CoinGecko, no write)
+vaultd-price --vault portfolio.vaultd
+
+# Fetch prices and update the vault (confirm before write)
+vaultd-price --vault portfolio.vaultd --write
+
+# Open terminal UI
+vaultd-tui portfolio.vaultd
 
 # High-value vault — increase Argon2id memory cost
-python scripts/save_vaultd.py --payload data.json --output vault.vaultd --argon2-m 131072 --argon2-t 4
+vaultd-save --payload data.json --output vault.vaultd --argon2-m 131072 --argon2-t 4
 ```
+
+---
+
+## CLI Reference
+
+| Command | Description |
+|---|---|
+| `vaultd-save` | Encrypt a JSON payload into a `.vaultd` file |
+| `vaultd-load` | Decrypt and display a `.vaultd` file |
+| `vaultd-import <source>` | Import exchange CSV into vault's `transactions[]` |
+| `vaultd-price` | Fetch live prices via CoinGecko oracle, optionally write |
+| `vaultd-tui` | Open the Textual terminal UI (6 tabs, dark theme) |
+
+### Supported import sources
+
+| Source | Format | Notes |
+|---|---|---|
+| `coinbase` | Coinbase transaction history CSV | Auto-detects 7-line metadata header |
+| `etherscan` | Normal transactions + ERC-20 transfers | Auto-detects export type |
+| `solscan` | SOL transactions + SPL token transfers | Use `--chain` to label chain |
+| `binance` | Trade history / transaction history / deposit-withdrawal | Auto-detects format |
+| `kraken` | Ledger export + trade export | Normalizes XXBT→BTC, XETH→ETH, etc. |
+
+All importers: atomic merge, deduplication by `tx_hash` (or composite key for CEX), schema validation.
 
 ---
 
@@ -185,6 +232,8 @@ python scripts/save_vaultd.py --payload data.json --output vault.vaultd --argon2
 | `alerts[]` | Personal threshold rules — checked on every session open | v1.1 |
 | `tax_summary` | Taxable events for accountant handoff (jurisdiction-aware) | v1.1 |
 | `agent_handoffs[]` | Log of context passed to other AI models | v1.1 |
+| `watchlist[]` | Assets under consideration with draft thesis | v1.1 |
+| `journal[]` | Personal market notes and monthly reviews | v1.1 |
 
 ---
 
@@ -192,7 +241,7 @@ python scripts/save_vaultd.py --payload data.json --output vault.vaultd --argon2
 
 - **Not a wallet** — cannot sign transactions
 - **Not a keystore** — private keys must never enter this file
-- **Not a live tracker** — prices are manual input, no blockchain connection
+- **Not a live tracker** — prices are manual (use `vaultd-price` to update)
 - **Not a tax filing tool** — `tax_summary` is for accountant handoff only
 - **Not a cloud service** — zero server, zero automatic sync
 
@@ -205,24 +254,43 @@ vaultd/
 ├── README.md                  This file
 ├── SPEC.md                    Technical specification
 ├── SKILL.md                   Agent skill file — load into any AI agent
+├── ROADMAP.md                 v2.5–v3.5 roadmap
+├── RFC-001-roadmap.md         Community RFC post
 ├── CHANGELOG.md               Version history
 ├── CONTRIBUTING.md            How to contribute
 ├── SECURITY.md                Threat model + responsible disclosure
 ├── LICENSE                    CC0 1.0 Universal
-├── pyproject.toml             Python packaging (pip install -e .)
+├── pyproject.toml             Python packaging
 ├── requirements.txt           Pinned runtime dependencies
 ├── requirements-dev.txt       Dev + test dependencies
 ├── .github/workflows/ci.yml   GitHub Actions CI (Python 3.10–3.13)
 ├── schemas/
-│   ├── vaultd_v11.json        Schema v1.1 (legacy)
-│   └── vaultd_v12.json        Schema v1.2 (current)
+│   ├── vaultd_v11.json        Schema v1.1 (legacy, supported)
+│   ├── vaultd_v12.json        Schema v1.2
+│   └── vaultd_v121.json       Schema v1.2.1 (current)
 ├── examples/
-│   └── example_v11_full.json  Full example payload (unencrypted)
+│   ├── example_v11_full.json  Full example payload v1.1
+│   └── example_v25_full.json  Example payload v2.5 with multi-source imports
 ├── scripts/
 │   ├── save_vaultd.py         Reference encrypt script
 │   └── load_vaultd.py         Reference decrypt script
-└── tests/
-    └── test_roundtrip.py      19-test suite (roundtrip, tampering, Hypothesis)
+├── tests/
+│   ├── test_roundtrip.py      Encryption roundtrip + tampering tests
+│   ├── test_importers.py      Coinbase + Etherscan importer tests
+│   ├── test_importers_v25.py  Solscan + Binance + Kraken importer tests
+│   └── test_oracle.py         Price oracle tests
+└── vaultd/
+    ├── core.py                Encrypt / decrypt / validate
+    ├── oracle.py              CoinGecko price oracle (5-min cache)
+    ├── tui.py                 Textual TUI (6 tabs, dark theme)
+    ├── cli/                   CLI entry points
+    └── importers/             Exchange CSV importers
+        ├── coinbase.py
+        ├── etherscan.py
+        ├── solscan.py
+        ├── binance.py
+        ├── kraken.py
+        └── merge.py           Deduplication + atomic merge
 ```
 
 ---
@@ -231,6 +299,18 @@ vaultd/
 
 `.vaultd` is a domain extension of the [`.klickd` v3.0 format](https://github.com/Davincc77/klickdskill).  
 Same cryptographic envelope (`AES-256-GCM + Argon2id`) with `domain: "crypto"` and an extended payload schema.
+
+---
+
+## Roadmap
+
+See [ROADMAP.md](ROADMAP.md) for the full v2.5–v3.5 plan.  
+Community input: [RFC-001-roadmap.md](RFC-001-roadmap.md) — open for comment.
+
+Next milestones:
+- **v2.8** — Private Tax Auditor Mode (local PnL, Koinly/CoinTracker export, handoff vault)
+- **v3.0** — Thesis-Linked On-Chain Risk Oracle (Aave/Compound health, IL detection, contract upgrades)
+- **v3.5** — Mobile Air-Gapped Companion (PWA, QR-code patch transfer, fully offline)
 
 ---
 
