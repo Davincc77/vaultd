@@ -15,7 +15,7 @@ Usage:
     payload = load_vaultd("portfolio.vaultd", "my-passphrase")
 """
 
-__version__ = "1.2.0"
+__version__ = "1.2.1"
 __author__ = "Vince C. (Klickd / Luxlearn)"
 __license__ = "CC0-1.0"
 
