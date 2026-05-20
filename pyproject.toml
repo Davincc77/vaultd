@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "vaultd"
-version = "1.2.1"
+version = "2.0.0"
 description = "AES-256-GCM + Argon2id encrypted crypto portfolio context for AI agents"
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -41,6 +41,7 @@ dev = [
 [project.scripts]
 vaultd-save = "vaultd.cli.save:main"
 vaultd-load = "vaultd.cli.load:main"
+vaultd-import = "vaultd.cli.import_cmd:main"
 
 [project.entry-points."vaultd.plugins"]
 core = "vaultd.core"
