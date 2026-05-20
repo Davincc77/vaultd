@@ -16,6 +16,7 @@ import argparse
 import getpass
 import sys
 
+import vaultd
 from vaultd.core import create_vaultd, load_vaultd
 from vaultd.importers import IMPORTERS, get_importer
 from vaultd.importers.merge import merge_transactions
@@ -63,9 +64,19 @@ Examples:
         help="Parse and show what would be imported without modifying the vault",
     )
     parser.add_argument(
+        "--verbose",
+        action="store_true",
+        help="(with --dry-run) Show all skipped rows and full warning list",
+    )
+    parser.add_argument(
         "--skip-validation",
         action="store_true",
         help="Skip JSON Schema validation after merge",
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"vaultd {vaultd.__version__}",
     )
     args = parser.parse_args()
 
@@ -94,11 +105,14 @@ Examples:
     # Show parse results
     print(f"[*] Parsed {result.total} transactions, {result.skipped_count} skipped")
     if result.warnings:
-        print(f"[WARN] {len(result.warnings)} warnings:")
-        for w in result.warnings[:10]:
+        verbose_mode = getattr(args, "verbose", False)
+        warn_limit = None if verbose_mode else 10
+        print(f"[WARN] {len(result.warnings)} warning(s):")
+        shown = result.warnings if warn_limit is None else result.warnings[:warn_limit]
+        for w in shown:
             print(f"  • {w}")
-        if len(result.warnings) > 10:
-            print(f"  … and {len(result.warnings) - 10} more")
+        if warn_limit and len(result.warnings) > warn_limit:
+            print(f"  … and {len(result.warnings) - warn_limit} more (use --verbose to see all)")
 
     if result.total == 0:
         print("[INFO] No transactions to import. Exiting.")
@@ -106,11 +120,19 @@ Examples:
 
     # Dry run — show preview and exit
     if args.dry_run:
+        verbose_mode = getattr(args, "verbose", False)
         print(f"\n[DRY RUN] Would import {result.total} transactions:")
-        for tx in result.transactions[:5]:
+        tx_limit = None if verbose_mode else 5
+        shown_txs = result.transactions if tx_limit is None else result.transactions[:tx_limit]
+        for tx in shown_txs:
             print(f"  {tx['date']} | {tx['type']:15s} | {tx['asset']:8s} | {tx['amount']}")
-        if result.total > 5:
-            print(f"  … and {result.total - 5} more")
+        if tx_limit and result.total > tx_limit:
+            print(f"  … and {result.total - tx_limit} more (use --verbose to see all)")
+        if verbose_mode and result.skipped_count > 0:
+            print(f"\n[DRY RUN] Skipped rows ({result.skipped_count}):")
+            for s in result.skipped:
+                row_id = s.get('sig') or s.get('txid') or s.get('row', '?')
+                print(f"  • row {s.get('row', '?')} [{row_id}]: {s.get('reason', 'unknown')}")
         print("\n[DRY RUN] No changes made to vault.")
         return
 

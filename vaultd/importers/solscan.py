@@ -215,7 +215,16 @@ class SolscanImporter(BaseImporter):
         tx_type_raw: str, chain: str, result: ImportResult
     ) -> dict[str, Any] | None:
         """Parse an SPL token transfer row."""
-        token_symbol = (get(row, "token symbol") or "UNKNOWN").upper()
+        raw_symbol = get(row, "token symbol")
+        if not raw_symbol or not raw_symbol.strip():
+            result.warnings.append(
+                f"Row {idx}: SPL token symbol is empty — "
+                f"token address: {get(row, 'token address') or 'N/A'}. "
+                f"Defaulting to 'UNKNOWN'. Run vaultd-price or update manually."
+            )
+            token_symbol = "UNKNOWN"
+        else:
+            token_symbol = raw_symbol.strip().upper()
         token_amount_raw = get(row, "token amount", "amount")
 
         amount = self._safe_float(token_amount_raw)

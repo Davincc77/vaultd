@@ -5,6 +5,25 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ---
 
+## [2.5.1] — 2026-05-20
+
+### Added
+- **base.py** — three new date formats in `_normalize_date`:
+  - `%Y-%m-%dT%H:%M:%S.%fZ` — ISO 8601 with milliseconds + Z (e.g. Binance API exports)
+  - `%Y-%m-%dT%H:%M:%S.%f` — ISO 8601 with microseconds (no Z)
+  - `%Y-%m-%dT%H:%M:%S` — ISO 8601 without timezone suffix
+- **`--version` flag** on all CLI entry points (`vaultd-save`, `vaultd-load`, `vaultd-import`, `vaultd-price`, `vaultd-tui`)
+- **`vaultd-load --json`** — output now includes `_meta.vaultd_version` and `_meta.vaultd_schema_version` for agent consumers
+- **`vaultd-import --verbose`** — when combined with `--dry-run`, shows all warnings (not truncated at 10) and full skipped-row details
+- **11 new tests** in `tests/test_importers_v25.py` (`TestV251EdgeCases`) — 98 total, all passing
+
+### Fixed
+- **solscan.py** — SPL rows with empty `Token Symbol` now emit a warning and default to `"UNKNOWN"` instead of silently using it
+- **binance.py** — deposit/withdrawal rows where both source and destination address are empty now emit a warning before defaulting to `transfer_in`
+- **kraken.py** — `asset` field in ledger and trade rows now explicitly normalized with `.upper().strip()`
+
+---
+
 ## [2.5.0] — 2026-05-20
 
 ### Added

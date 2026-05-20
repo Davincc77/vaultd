@@ -13,6 +13,7 @@ import getpass
 import json
 import sys
 
+import vaultd
 from vaultd.core import (
     DEFAULT_ARGON2_M,
     DEFAULT_ARGON2_P,
@@ -60,6 +61,11 @@ Examples:
         "--skip-validation",
         action="store_true",
         help="Skip JSON Schema validation (not recommended)",
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"vaultd {vaultd.__version__}",
     )
     args = parser.parse_args()
 

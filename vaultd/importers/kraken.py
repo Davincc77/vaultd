@@ -208,7 +208,7 @@ class KrakenImporter(BaseImporter):
             "id": tx_id,
             "date": date,
             "type": vaultd_type,
-            "asset": asset,
+            "asset": asset.upper().strip(),
             "amount": abs(amount),
             "price_usd": None,  # Kraken ledger doesn't include price
             "fee_usd": fee_usd,
@@ -275,7 +275,7 @@ class KrakenImporter(BaseImporter):
             "id": tx_id,
             "date": date,
             "type": vaultd_type,
-            "asset": asset,
+            "asset": asset.upper().strip(),
             "amount": abs(amount),
             "price_usd": price_usd,
             "fee_usd": fee_usd,

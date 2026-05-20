@@ -598,3 +598,253 @@ class TestV25Deduplication:
         merged, new_count, dup_count = merge_transactions(r_sol.transactions, r_bin.transactions)
         assert len(merged) == 2
         assert dup_count == 0
+
+
+# ─── v2.5.1 Edge-Case Tests ───────────────────────────────────────────────────
+
+
+class TestV251EdgeCases:
+    """Edge cases surfaced by Grok v2.5.0 audit."""
+
+    # ── Binance: scientific notation amount ───────────────────────────────────
+
+    def test_binance_scientific_notation_change(self, tmp_path):
+        """Binance sometimes exports tiny amounts in scientific notation (e.g. 1e-08)."""
+        f = tmp_path / "sci.csv"
+        write_csv(f, [
+            {
+                "UTC_Time": "2024-07-01 00:00:00",
+                "Account": "Spot",
+                "Operation": "Commission",
+                "Coin": "BNB",
+                "Change": "1e-08",
+                "Remark": "",
+            }
+        ], BINANCE_TXN_COLS)
+        result = BinanceImporter().parse(str(f))
+        assert result.total == 1
+        tx = result.transactions[0]
+        assert tx["asset"] == "BNB"
+        assert tx["amount"] == pytest.approx(1e-8)
+        assert tx["type"] == "airdrop"
+
+    def test_binance_scientific_notation_large_exponent(self, tmp_path):
+        """Positive exponent: 1.5e+04 = 15000."""
+        f = tmp_path / "sci2.csv"
+        write_csv(f, [
+            {
+                "UTC_Time": "2024-08-01 12:00:00",
+                "Account": "Spot",
+                "Operation": "Deposit",
+                "Coin": "USDT",
+                "Change": "1.5e+04",
+                "Remark": "",
+            }
+        ], BINANCE_TXN_COLS)
+        result = BinanceImporter().parse(str(f))
+        assert result.total == 1
+        assert result.transactions[0]["amount"] == pytest.approx(15000.0)
+
+    def test_binance_ambiguous_deposit_warning(self, tmp_path):
+        """No source or destination address → warning emitted."""
+        f = tmp_path / "amb.csv"
+        write_csv(f, [
+            {
+                "Date(UTC)": "2024-09-01 10:00:00",
+                "Coin": "BTC",
+                "Amount": "0.01",
+                "TransactionFee": "0",
+                "Address": "",
+                "TXID": "0xambiguous",
+                "SourceAddress": "",
+                "PaymentID": "",
+                "Status": "Completed",
+            }
+        ], BINANCE_DEPOSIT_COLS)
+        result = BinanceImporter().parse(str(f))
+        assert result.total == 1
+        assert result.transactions[0]["type"] == "transfer_in"
+        # Warning should be present
+        assert any("ambiguous" in w.lower() for w in result.warnings)
+
+    # ── Kraken: exotic pair / new token that isn't in _ASSET_ALIASES ──────────
+
+    def test_kraken_unknown_token_ledger(self, tmp_path):
+        """A brand-new Kraken token not in the alias map should pass through as-is."""
+        f = tmp_path / "new_token.csv"
+        write_csv(f, [
+            {
+                "txid": "LNEW001",
+                "refid": "RNEW001",
+                "time": "2025-01-01 00:00:00",
+                "type": "deposit",
+                "subtype": "",
+                "aclass": "currency",
+                "asset": "NEWTOKEN",
+                "amount": "100.0",
+                "fee": "0",
+                "balance": "100.0",
+            }
+        ], KRAKEN_LEDGER_COLS)
+        result = KrakenImporter().parse(str(f))
+        assert result.total == 1
+        tx = result.transactions[0]
+        assert tx["asset"] == "NEWTOKEN"
+        assert tx["type"] == "transfer_in"
+
+    def test_kraken_unknown_token_asset_uppercase(self, tmp_path):
+        """Assets returned from importer must always be uppercase."""
+        f = tmp_path / "lower.csv"
+        write_csv(f, [
+            {
+                "txid": "LLOWER1",
+                "refid": "RLOWER1",
+                "time": "2025-02-01 00:00:00",
+                "type": "staking",
+                "subtype": "",
+                "aclass": "currency",
+                "asset": "eth2",   # lowercase input
+                "amount": "0.001",
+                "fee": "0",
+                "balance": "0.001",
+            }
+        ], KRAKEN_LEDGER_COLS)
+        result = KrakenImporter().parse(str(f))
+        assert result.total == 1
+        assert result.transactions[0]["asset"] == "ETH2"  # must be uppercased
+
+    def test_kraken_exotic_pair_trade(self, tmp_path):
+        """An exotic pair not in the standard list should still import gracefully."""
+        f = tmp_path / "exotic.csv"
+        write_csv(f, [
+            {
+                "txid": "TEXOTIC1",
+                "ordertxid": "OEXOTIC1",
+                "pair": "NEWCOINUSDT",
+                "time": "2025-03-01 12:00:00",
+                "type": "buy",
+                "ordertype": "market",
+                "price": "0.5",
+                "cost": "50.0",
+                "fee": "0.1",
+                "vol": "100.0",
+                "margin": "0",
+                "misc": "",
+                "ledgers": "",
+                "postxid": "",
+            }
+        ], KRAKEN_TRADE_COLS)
+        result = KrakenImporter().parse(str(f))
+        assert result.total == 1
+        tx = result.transactions[0]
+        assert tx["type"] == "buy"
+        assert tx["amount"] == pytest.approx(100.0)
+        # Asset should be some substring of NEWCOINUSDT, uppercased
+        assert tx["asset"] == tx["asset"].upper()
+
+    # ── Solscan: SPL zero amount ───────────────────────────────────────────────
+
+    def test_solscan_spl_zero_amount_skipped(self, tmp_path):
+        """SPL transfer with amount=0 should be skipped (unparseable → None after abs)."""
+        f = tmp_path / "zero.csv"
+        write_csv(f, [
+            {
+                "Signature": "zero001",
+                "Block": "400000000",
+                "Time": "2024-10-01 08:00:00",
+                "From": "SenderZero",
+                "To": "MyWallet",
+                "Token Address": "EPjFW...",
+                "Token Symbol": "USDC",
+                "Token Amount": "0",
+                "Type": "SPL Transfer In",
+            }
+        ], SOLSCAN_SPL_COLS)
+        result = SolscanImporter().parse(str(f))
+        # 0 is a valid float so amount=0 → abs(0)=0 — it is kept (not skipped)
+        # The spec does not define a min-value filter for SPL, only SOL has dust filter
+        assert result.total == 1
+        assert result.transactions[0]["amount"] == pytest.approx(0.0)
+
+    def test_solscan_spl_empty_symbol_warns(self, tmp_path):
+        """SPL row with blank token symbol should warn and default to UNKNOWN."""
+        f = tmp_path / "nosym.csv"
+        write_csv(f, [
+            {
+                "Signature": "nosym001",
+                "Block": "400000001",
+                "Time": "2024-10-02 09:00:00",
+                "From": "SenderA",
+                "To": "MyWallet",
+                "Token Address": "SomeTokenAddr123",
+                "Token Symbol": "",
+                "Token Amount": "10.0",
+                "Type": "SPL Transfer In",
+            }
+        ], SOLSCAN_SPL_COLS)
+        result = SolscanImporter().parse(str(f))
+        assert result.total == 1
+        assert result.transactions[0]["asset"] == "UNKNOWN"
+        assert any("symbol is empty" in w.lower() for w in result.warnings)
+
+    # ── base.py: new date format parsing ──────────────────────────────────────
+
+    def test_base_date_iso8601_with_milliseconds_Z(self, tmp_path):
+        """ISO 8601 with milliseconds + Z suffix: 2024-06-01T12:00:00.000Z"""
+        f = tmp_path / "msz.csv"
+        write_csv(f, [
+            {
+                "Signature": "msz001",
+                "Block": "1",
+                "Time": "2024-06-01T12:00:00.000Z",
+                "From": "A",
+                "To": "B",
+                "SOL Amount": "1.0",
+                "Fee(SOL)": "0.000005",
+                "Status": "Success",
+                "Type": "transfer",
+            }
+        ], SOLSCAN_SOL_COLS)
+        result = SolscanImporter().parse(str(f))
+        assert result.total == 1
+        assert result.transactions[0]["date"] == "2024-06-01T12:00:00Z"
+
+    def test_base_date_iso8601_with_microseconds(self, tmp_path):
+        """ISO 8601 without Z but with microseconds: 2024-06-01T12:00:00.123456"""
+        f = tmp_path / "us.csv"
+        write_csv(f, [
+            {
+                "Signature": "us001",
+                "Block": "2",
+                "Time": "2024-07-15T08:30:00.123456",
+                "From": "C",
+                "To": "D",
+                "SOL Amount": "2.0",
+                "Fee(SOL)": "0.000005",
+                "Status": "Success",
+                "Type": "transfer",
+            }
+        ], SOLSCAN_SOL_COLS)
+        result = SolscanImporter().parse(str(f))
+        assert result.total == 1
+        assert result.transactions[0]["date"] == "2024-07-15T08:30:00Z"
+
+    def test_base_date_mm_dd_yyyy_hhmm(self, tmp_path):
+        """MM/DD/YYYY HH:MM format used by some CEX exports."""
+        f = tmp_path / "mmdd.csv"
+        write_csv(f, [
+            {
+                "Signature": "mmdd001",
+                "Block": "3",
+                "Time": "06/01/2024 12:00",
+                "From": "E",
+                "To": "F",
+                "SOL Amount": "3.0",
+                "Fee(SOL)": "0.000005",
+                "Status": "Success",
+                "Type": "transfer",
+            }
+        ], SOLSCAN_SOL_COLS)
+        result = SolscanImporter().parse(str(f))
+        assert result.total == 1
+        assert result.transactions[0]["date"] == "2024-06-01T12:00:00Z"

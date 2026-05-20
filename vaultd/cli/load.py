@@ -16,6 +16,7 @@ import json
 import sys
 from pathlib import Path
 
+import vaultd
 from vaultd.core import load_vaultd
 
 
@@ -121,6 +122,11 @@ Examples:
     parser.add_argument(
         "--skip-validation", action="store_true", help="Skip JSON Schema validation"
     )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"vaultd {vaultd.__version__}",
+    )
     args = parser.parse_args()
 
     if args.passphrase_stdin:
@@ -140,7 +146,12 @@ Examples:
         )
         print(f"[OK] Decrypted payload written to: {args.output}")
     elif args.json:
-        print(json.dumps(payload, ensure_ascii=False, indent=2))
+        # Inject vaultd tool version + schema version for agent consumers
+        output = dict(payload)
+        output.setdefault("_meta", {})
+        output["_meta"]["vaultd_version"] = vaultd.__version__
+        output["_meta"]["vaultd_schema_version"] = payload.get("vaultd_version", "unknown")
+        print(json.dumps(output, ensure_ascii=False, indent=2))
     else:
         print_summary(payload)
 

@@ -334,7 +334,13 @@ class BinanceImporter(BaseImporter):
         elif dest_addr and dest_addr not in ("-", "N/A", ""):
             vaultd_type = "transfer_out"
         else:
+            # Neither source nor destination address is set — cannot determine direction
             vaultd_type = "transfer_in"  # Default to deposit if ambiguous
+            result.warnings.append(
+                f"Row {idx}: Binance deposit/withdrawal row for {coin} has no "
+                f"source or destination address — direction is ambiguous. "
+                f"Defaulted to 'transfer_in'. Verify manually."
+            )
 
         tx_id = self._make_tx_id("binance", txid, date, coin, idx)
 

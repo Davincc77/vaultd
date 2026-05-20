@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "vaultd"
-version = "2.5.0"
+version = "2.5.1"
 description = "Local-first, encrypted crypto portfolio tracker with AI agent integration. AES-256-GCM + Argon2id. Zero server. Import from Coinbase, Etherscan, Solscan, Binance, Kraken."
 readme = "README.md"
 license = { file = "LICENSE" }

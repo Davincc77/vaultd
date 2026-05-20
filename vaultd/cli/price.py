@@ -14,6 +14,7 @@ import argparse
 import getpass
 import sys
 
+import vaultd
 from vaultd.core import create_vaultd, load_vaultd
 from vaultd.oracle import build_price_update_delta, fetch_prices
 
@@ -51,6 +52,11 @@ Examples:
         "--skip-validation",
         action="store_true",
         help="Skip JSON Schema validation",
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"vaultd {vaultd.__version__}",
     )
     args = parser.parse_args()
 

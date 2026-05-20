@@ -71,11 +71,24 @@ class BaseImporter(ABC):
         from datetime import datetime, timezone
 
         raw = raw.strip()
+
+        # Handle millisecond timestamps (ISO 8601 with .fZ or plain .f)
+        # e.g. 2024-06-01T12:00:00.000Z  or  2024-06-01T12:00:00.123456
+        if raw.endswith("Z") and "." in raw:
+            # Normalise to %Y-%m-%dT%H:%M:%S.%fZ by zero-padding if needed
+            raw = raw  # strptime %f handles 1-6 digits
+        elif raw.endswith("Z") and "T" not in raw:
+            # Unlikely but guard: date-only with Z
+            raw = raw.rstrip("Z") + "T00:00:00Z"
+
         formats = [
-            "%Y-%m-%dT%H:%M:%SZ",
+            "%Y-%m-%dT%H:%M:%SZ",          # 2024-06-01T12:00:00Z
+            "%Y-%m-%dT%H:%M:%S.%fZ",        # 2024-06-01T12:00:00.000Z
+            "%Y-%m-%dT%H:%M:%S.%f",         # 2024-06-01T12:00:00.123456
+            "%Y-%m-%dT%H:%M:%S",            # 2024-06-01T12:00:00
             "%Y-%m-%d %H:%M:%S UTC",
             "%Y-%m-%d %H:%M:%S",
-            "%m/%d/%Y %H:%M",
+            "%m/%d/%Y %H:%M",               # 06/01/2024 12:00
             "%Y-%m-%d",
         ]
         for fmt in formats:

@@ -11,6 +11,7 @@ import argparse
 import getpass
 import sys
 
+import vaultd
 from vaultd.core import load_vaultd
 
 
@@ -21,6 +22,11 @@ def main() -> None:
     )
     parser.add_argument("vault", help="Path to your .vaultd file")
     parser.add_argument("--skip-validation", action="store_true")
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"vaultd {vaultd.__version__}",
+    )
     args = parser.parse_args()
 
     passphrase = getpass.getpass(f"Passphrase for {args.vault}: ")
