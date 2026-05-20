@@ -374,4 +374,4 @@ def test_get_importer_etherscan():
 
 def test_get_importer_unknown():
     with pytest.raises(ValueError, match="Unknown importer"):
-        get_importer("binance")
+        get_importer("not_a_real_exchange")

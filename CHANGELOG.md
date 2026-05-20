@@ -5,6 +5,40 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ---
 
+## [2.5.0] — 2026-05-20
+
+### Added
+- **Solscan importer** (`vaultd/importers/solscan.py`) — Solana native transaction CSV and SPL token transfer CSV exports
+  - Maps to `transfer_in`, `transfer_out`, `swap`, `stake`, `unstake`, `claim_rewards`, `nft_mint`, `airdrop`
+  - Direction detection via wallet address matching
+  - Dust filter (< 0.0001 SOL)
+  - `--chain` flag on CLI to override chain label (default: `solana`)
+- **Binance importer** (`vaultd/importers/binance.py`) — three Binance export formats:
+  - Trade History CSV (Date/Pair/Side/Price/Executed/Amount/Fee)
+  - Transaction History CSV (UTC_Time/Operation/Coin/Change)
+  - Deposit/Withdrawal History CSV (TXID-linked, status filter)
+  - 30+ operation type mappings including staking, rewards, P2P, auto-invest, convert
+- **Kraken importer** (`vaultd/importers/kraken.py`) — two Kraken export formats:
+  - Ledger export — full operation type + subtype mapping (spottostaking, stakingtospot, etc.)
+  - Trade export — vol/price/fee with quote-currency fee_usd resolution
+  - Automatic Kraken asset normalization (XXBT→BTC, XETH→ETH, ZEUR→EUR, etc.)
+  - Fiat-only ledger entries skipped automatically
+- `vaultd/importers/__init__.py` — registered `solscan`, `binance`, `kraken` in IMPORTERS registry
+- `vaultd/cli/import_cmd.py` — `--chain` flag for Solscan; `--wallet-address` help updated
+- 27 new tests in `tests/test_importers_v25.py` (87 total, all passing)
+- `ROADMAP.md` — v2.5→v3.5 roadmap with philosophy, milestones, RFC governance
+- `RFC-001-roadmap.md` — GitHub Discussions RFC post with community questions
+
+### Changed
+- Version bumped: `2.1.0` → `2.5.0`
+- `vaultd-import` CLI help text updated with Solscan/Binance/Kraken examples
+- Binance `staking_rewards` → `claim_rewards` (was `airdrop`)
+
+### Fixed
+- `test_get_importer_unknown` used `"binance"` as the unknown name — updated to `"not_a_real_exchange"`
+
+---
+
 ## [1.2] — 2026-05-20
 
 ### Added

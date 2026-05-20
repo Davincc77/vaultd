@@ -4,6 +4,9 @@ vaultd-import — CLI entry point for importing exchange CSV exports into a .vau
 Usage:
   vaultd-import coinbase export.csv --vault portfolio.vaultd --wallet-id coinbase-main
   vaultd-import etherscan txns.csv --vault portfolio.vaultd --wallet-id hw-ledger --wallet-address 0xabc...
+  vaultd-import solscan txns.csv --vault portfolio.vaultd --wallet-id sol-main --chain solana
+  vaultd-import binance trades.csv --vault portfolio.vaultd --wallet-id binance
+  vaultd-import kraken ledger.csv --vault portfolio.vaultd --wallet-id kraken-main
   vaultd-import coinbase export.csv --vault portfolio.vaultd --dry-run
 """
 
@@ -47,7 +50,12 @@ Examples:
     parser.add_argument(
         "--wallet-address",
         default=None,
-        help="(Etherscan only) Your Ethereum address, used to determine transfer direction",
+        help="(Etherscan/Solscan) Your wallet address, used to determine transfer direction",
+    )
+    parser.add_argument(
+        "--chain",
+        default=None,
+        help="(Solscan only) Chain label to record on transactions (default: solana)",
     )
     parser.add_argument(
         "--dry-run",
@@ -68,6 +76,11 @@ Examples:
     kwargs: dict = {"wallet_id": args.wallet_id}
     if args.source == "etherscan" and args.wallet_address:
         kwargs["wallet_address"] = args.wallet_address
+    if args.source == "solscan":
+        if args.wallet_address:
+            kwargs["wallet_address"] = args.wallet_address
+        if args.chain:
+            kwargs["chain"] = args.chain
 
     try:
         result = importer.parse(args.csv_file, **kwargs)
