@@ -9,18 +9,18 @@ Usage:
 Requirements: pip install cryptography argon2-cffi jsonschema
 """
 
-import json
-import base64
-import os
 import argparse
+import base64
 import getpass
-import tempfile
+import json
+import os
 import sys
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
+from argon2.low_level import Type, hash_secret_raw
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-from argon2.low_level import hash_secret_raw, Type
 
 # Resolve schema path relative to this file
 _SCHEMA_PATH = Path(__file__).parent.parent / "schemas" / "vaultd_v12.json"
@@ -55,7 +55,7 @@ def validate_payload(payload: dict) -> None:
         print(f"[WARN] Schema not found at {_SCHEMA_PATH} — skipping validation.", file=sys.stderr)
         return
 
-    with open(_SCHEMA_PATH, "r", encoding="utf-8") as f:
+    with open(_SCHEMA_PATH, encoding="utf-8") as f:
         schema = json.load(f)
 
     try:
@@ -165,7 +165,7 @@ def create_vaultd(
     print(f"     Payload size : {len(plaintext):,} bytes")
     print(f"     Envelope size: {len(envelope_bytes):,} bytes")
     print(f"     Argon2id     : m={argon2_m}, t={argon2_t}, p={argon2_p}")
-    print(f"     Version      : vaultd v1.2 / klickd v3.0")
+    print("     Version      : vaultd v1.2 / klickd v3.0")
 
 
 def main():
@@ -207,7 +207,7 @@ Examples:
     args = parser.parse_args()
 
     # Load payload
-    with open(args.payload, "r", encoding="utf-8") as f:
+    with open(args.payload, encoding="utf-8") as f:
         payload = json.load(f)
 
     # Passphrase handling

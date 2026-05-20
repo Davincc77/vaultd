@@ -16,12 +16,10 @@ Tests:
 - Hypothesis property-based: roundtrip with random ASCII passphrases
 """
 
+import base64
 import json
 import os
 import sys
-import tempfile
-import base64
-from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
@@ -29,8 +27,8 @@ import pytest
 # Add scripts/ to path so we can import directly
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
-from save_vaultd import create_vaultd
 from load_vaultd import load_vaultd
+from save_vaultd import create_vaultd
 
 # ─── Fixtures ────────────────────────────────────────────────────────────────
 
@@ -233,9 +231,8 @@ class TestVersionCompat:
         A v1.1 envelope (manually constructed) loads successfully
         because 1.1 is in SUPPORTED_VAULTD_VERSIONS.
         """
-        from save_vaultd import create_vaultd as _create
+        from argon2.low_level import Type, hash_secret_raw
         from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-        from argon2.low_level import hash_secret_raw, Type
 
         payload = {**MINIMAL_PAYLOAD}
         plaintext = json.dumps(payload, separators=(",", ":")).encode()

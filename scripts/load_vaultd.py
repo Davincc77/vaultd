@@ -11,16 +11,16 @@ Usage:
 Requirements: pip install cryptography argon2-cffi jsonschema
 """
 
-import json
-import base64
 import argparse
+import base64
 import getpass
+import json
 import sys
 from pathlib import Path
 
-from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-from argon2.low_level import hash_secret_raw, Type
+from argon2.low_level import Type, hash_secret_raw
 from cryptography.exceptions import InvalidTag
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 # Resolve schema path relative to this file
 _SCHEMA_PATH = Path(__file__).parent.parent / "schemas" / "vaultd_v12.json"
@@ -52,7 +52,7 @@ def validate_payload(payload: dict) -> None:
         print(f"[WARN] Schema not found at {_SCHEMA_PATH} — skipping validation.", file=sys.stderr)
         return
 
-    with open(_SCHEMA_PATH, "r", encoding="utf-8") as f:
+    with open(_SCHEMA_PATH, encoding="utf-8") as f:
         schema = json.load(f)
 
     try:
@@ -231,7 +231,7 @@ def print_summary(payload: dict) -> None:
             print(f"  • [{a.get('asset')}] {a.get('type')} — {a.get('message')}")
 
     if identity.get("agent_instructions"):
-        print(f"\n[AGENT INSTRUCTIONS — untrusted user context]")
+        print("\n[AGENT INSTRUCTIONS — untrusted user context]")
         print(f"  {identity['agent_instructions'][:200]}{'...' if len(identity.get('agent_instructions', '')) > 200 else ''}")
 
     print()
