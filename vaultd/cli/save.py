@@ -63,7 +63,7 @@ Examples:
     )
     args = parser.parse_args()
 
-    with open(args.payload, "r", encoding="utf-8") as f:
+    with open(args.payload, encoding="utf-8") as f:
         payload = json.load(f)
 
     passphrase = getpass.getpass("Passphrase: ")
@@ -98,7 +98,7 @@ Examples:
         )
         print(f"[OK] .vaultd file created: {args.output}")
         print(f"     Argon2id: m={args.argon2_m}, t={args.argon2_t}, p={args.argon2_p}")
-        print(f"     Version : vaultd v1.2 / klickd v3.0")
+        print("     Version : vaultd v1.2 / klickd v3.0")
     except ValueError as e:
         print(f"[ERROR] {e}", file=sys.stderr)
         sys.exit(1)

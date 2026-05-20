@@ -72,7 +72,7 @@ def validate_payload(payload: dict[str, Any]) -> None:
         )
         return
 
-    with open(_SCHEMA_PATH, "r", encoding="utf-8") as f:
+    with open(_SCHEMA_PATH, encoding="utf-8") as f:
         schema = json.load(f)
 
     try:
