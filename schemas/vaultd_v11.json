@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Davincc77/vaultd/schemas/vaultd_v11.json",
+  "title": ".vaultd payload schema v1.1",
+  "description": "JSON Schema for the decrypted payload of a .vaultd v1.1 file",
+  "type": "object",
+  "required": ["created_at", "identity", "wallets", "holdings", "transactions", "strategy"],
+  "properties": {
+    "created_at": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$" },
+    "identity": {
+      "type": "object",
+      "required": ["alias", "language"],
+      "properties": {
+        "alias": { "type": "string" },
+        "language": { "type": "string" },
+        "timezone": { "type": "string" },
+        "risk_profile": { "type": "string", "enum": ["conservative", "moderate", "moderate_aggressive", "aggressive", "degen"] },
+        "experience_level": { "type": "string", "enum": ["beginner", "intermediate", "advanced", "professional"] },
+        "agent_instructions": { "type": "string", "maxLength": 4096 }
+      }
+    },
+    "wallets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "chain", "type"],
+        "properties": {
+          "id": { "type": "string" },
+          "label": { "type": "string" },
+          "chain": { "type": "string" },
+          "address": { "type": ["string", "null"] },
+          "type": { "type": "string", "enum": ["self_custody", "cex", "multisig", "hardware"] },
+          "custody": { "type": "string" },
+          "tracked_since": { "type": "string" },
+          "tags": { "type": "array", "items": { "type": "string" } },
+          "note": { "type": "string" }
+        }
+      }
+    },
+    "holdings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "wallet_id", "asset", "chain", "amount", "avg_buy_price_usd"],
+        "properties": {
+          "id": { "type": "string" },
+          "wallet_id": { "type": "string" },
+          "asset": { "type": "string" },
+          "chain": { "type": "string" },
+          "amount": { "type": "number", "minimum": 0 },
+          "avg_buy_price_usd": { "type": "number", "minimum": 0 },
+          "current_price_usd": { "type": ["number", "null"] },
+          "last_updated": { "type": "string" },
+          "tags": { "type": "array", "items": { "type": "string" } },
+          "thesis_id": { "type": ["string", "null"] },
+          "note": { "type": "string" }
+        }
+      }
+    },
+    "thesis": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "asset", "status", "conviction", "entry_rationale"],
+        "properties": {
+          "id": { "type": "string" },
+          "asset": { "type": "string" },
+          "created_at": { "type": "string" },
+          "status": { "type": "string", "enum": ["active", "partial_exit", "closed", "invalidated"] },
+          "conviction": { "type": "string", "enum": ["low", "medium", "high", "conviction_trade"] },
+          "time_horizon": { "type": "string" },
+          "entry_rationale": { "type": "string" },
+          "target_exit_usd": { "type": ["number", "null"] },
+          "stop_loss_usd": { "type": ["number", "null"] },
+          "invalidation_hypothesis": { "type": "string" },
+          "position_size_rationale": { "type": "string" },
+          "last_reviewed": { "type": "string" },
+          "review_notes": { "type": "string" },
+          "tags": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "risk_events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "date", "event_type", "action_taken"],
+        "properties": {
+          "id": { "type": "string" },
+          "date": { "type": "string" },
+          "event_type": { "type": "string", "enum": ["market_crash", "pump", "liquidation_risk", "protocol_exploit", "regulatory_news", "thesis_invalidation", "target_reached", "stop_loss_hit"] },
+          "market_context": { "type": "string" },
+          "portfolio_impact_usd": { "type": ["number", "null"] },
+          "portfolio_impact_pct": { "type": ["number", "null"] },
+          "sentiment_at_time": { "type": "string", "enum": ["panicked", "anxious", "neutral", "confident", "euphoric"] },
+          "action_taken": { "type": "string" },
+          "action_rationale": { "type": "string" },
+          "outcome": { "type": ["string", "null"] },
+          "lesson": { "type": ["string", "null"] },
+          "tags": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "alerts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "asset", "type", "message", "active"],
+        "properties": {
+          "id": { "type": "string" },
+          "asset": { "type": "string" },
+          "type": { "type": "string", "enum": ["price_below", "price_above", "allocation_above_pct", "stablecoin_below_pct", "pnl_target_reached", "stop_loss_approach", "defi_apy_below"] },
+          "threshold_usd": { "type": ["number", "null"] },
+          "threshold_pct": { "type": ["number", "null"] },
+          "message": { "type": "string" },
+          "action_suggested": { "type": "string" },
+          "active": { "type": "boolean" }
+        }
+      }
+    },
+    "strategy": {
+      "type": "object",
+      "properties": {
+        "time_horizon": { "type": "string", "enum": ["short_term", "medium_term", "long_term"] },
+        "dca_assets": { "type": "array", "items": { "type": "string" } },
+        "dca_frequency": { "type": "string" },
+        "max_single_asset_pct": { "type": "number" },
+        "stablecoin_reserve_pct": { "type": "number" },
+        "max_defi_exposure_pct": { "type": "number" },
+        "rules": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

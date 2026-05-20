@@ -1,0 +1,297 @@
+{
+  "created_at": "2026-05-20T10:00:00Z",
+  "identity": {
+    "alias": "Vince",
+    "language": "fr",
+    "timezone": "Europe/Luxembourg",
+    "risk_profile": "moderate_aggressive",
+    "experience_level": "advanced",
+    "agent_instructions": "Tu es mon gestionnaire de portfolio crypto. Reponds en francais. Ne propose jamais de vente sans que je te le demande. Rappelle toujours ma these avant tout commentaire de position. Signale si une action enfreint mes strategy.rules."
+  },
+  "wallets": [
+    {
+      "id": "wallet-001",
+      "label": "Main — Coinbase Wallet",
+      "chain": "base",
+      "address": "0x1234567890abcdef1234567890abcdef12345678",
+      "type": "self_custody",
+      "custody": "coinbase_wallet",
+      "tracked_since": "2025-01-01",
+      "tags": ["principal", "defi", "nft"],
+      "note": ""
+    },
+    {
+      "id": "wallet-002",
+      "label": "CEX — Coinbase",
+      "chain": "multi",
+      "address": null,
+      "type": "cex",
+      "custody": "coinbase",
+      "tracked_since": "2024-06-01",
+      "tags": ["cex", "fiat_on_ramp"],
+      "note": "Utilise pour les achats fiat -> crypto uniquement"
+    }
+  ],
+  "holdings": [
+    {
+      "id": "hold-001",
+      "wallet_id": "wallet-001",
+      "asset": "ETH",
+      "chain": "base",
+      "amount": 1.45,
+      "avg_buy_price_usd": 2800.00,
+      "current_price_usd": null,
+      "last_updated": "2026-05-20T09:00:00Z",
+      "tags": ["layer1", "long_term"],
+      "thesis_id": "thesis-001",
+      "note": ""
+    },
+    {
+      "id": "hold-002",
+      "wallet_id": "wallet-001",
+      "asset": "USDC",
+      "chain": "base",
+      "amount": 5000.00,
+      "avg_buy_price_usd": 1.00,
+      "current_price_usd": 1.00,
+      "last_updated": "2026-05-20T09:00:00Z",
+      "tags": ["stablecoin", "dry_powder"],
+      "thesis_id": null,
+      "note": "Reserve stablecoin"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "tx-001",
+      "wallet_id": "wallet-001",
+      "date": "2026-03-15T14:22:00Z",
+      "type": "buy",
+      "asset": "ETH",
+      "amount": 0.5,
+      "price_usd": 3100.00,
+      "fee_usd": 2.10,
+      "chain": "base",
+      "tx_hash": "0xabc123def456abc123def456abc123def456abc123def456abc123def456abc1",
+      "thesis_id": "thesis-001",
+      "note": "DCA mensuel"
+    },
+    {
+      "id": "tx-002",
+      "wallet_id": "wallet-002",
+      "date": "2026-02-20T10:00:00Z",
+      "type": "sell",
+      "asset": "ETH",
+      "amount": 0.3,
+      "price_usd": 3070.00,
+      "fee_usd": 1.50,
+      "chain": "ethereum",
+      "tx_hash": null,
+      "thesis_id": "thesis-001",
+      "note": "Prise de profit partielle +100%"
+    }
+  ],
+  "defi_positions": [
+    {
+      "id": "defi-001",
+      "wallet_id": "wallet-001",
+      "protocol": "Aerodrome",
+      "chain": "base",
+      "type": "liquidity_pool",
+      "pair": "ETH/USDC",
+      "entered_at": "2026-04-01T00:00:00Z",
+      "value_at_entry_usd": 3000.00,
+      "current_value_usd": null,
+      "rewards_claimed_usd": 45.00,
+      "impermanent_loss_usd": null,
+      "apy_at_entry_pct": 18.5,
+      "status": "active",
+      "risk": "medium",
+      "thesis_id": "thesis-001",
+      "note": "Verifier IL si ETH bouge > 20%"
+    }
+  ],
+  "nfts": [
+    {
+      "id": "nft-001",
+      "wallet_id": "wallet-001",
+      "collection": "DavincC Music NFTs",
+      "token_id": "1",
+      "chain": "base",
+      "acquired_date": "2026-01-10",
+      "acquired_price_usd": 150.00,
+      "floor_price_usd": null,
+      "utility": "royalties + community access",
+      "hold_reason": "Mon propre drop — royalties passives + valeur communautaire",
+      "status": "holding",
+      "last_updated": "2026-05-20"
+    }
+  ],
+  "thesis": [
+    {
+      "id": "thesis-001",
+      "asset": "ETH",
+      "created_at": "2025-12-01",
+      "status": "active",
+      "conviction": "high",
+      "time_horizon": "18_months",
+      "entry_rationale": "L2 flywheel acceleration (Base, Arbitrum, Optimism). EIP-4844 reduces blob costs. Fee burn maintains deflationary pressure. Primary catalyst: spot ETH ETF approval Q1 2026.",
+      "target_exit_usd": 6000.00,
+      "stop_loss_usd": 1800.00,
+      "invalidation_hypothesis": "If L2s migrate massively to alternative DA layers (Celestia, EigenDA) and ETH fees collapse durably below 500k/day.",
+      "position_size_rationale": "25% portfolio — core holding. Monthly DCA up to 2% portfolio/month.",
+      "last_reviewed": "2026-05-01",
+      "review_notes": "ETF approved Q1 2026. Thesis holds. Next catalyst: staking ETF.",
+      "tags": ["layer1", "macro", "dca"]
+    }
+  ],
+  "risk_events": [
+    {
+      "id": "risk-001",
+      "date": "2026-04-07T08:30:00Z",
+      "event_type": "market_crash",
+      "market_context": "ETH -18% in 24h. Macro panic following US CPI data.",
+      "portfolio_impact_usd": -2400.00,
+      "portfolio_impact_pct": -12.5,
+      "sentiment_at_time": "anxious",
+      "action_taken": "none",
+      "action_rationale": "Thesis intact. Stop loss at 1800 not triggered. Maintained planned DCA.",
+      "outcome": "ETH recovered +22% over next 10 days. Correct decision to hold.",
+      "lesson": "Do not react to corrections under 20% on core holdings when thesis is intact.",
+      "tags": ["crash", "eth", "discipline"]
+    }
+  ],
+  "alerts": [
+    {
+      "id": "alert-001",
+      "asset": "ETH",
+      "type": "price_below",
+      "threshold_usd": 2500.00,
+      "threshold_pct": null,
+      "message": "ETH below 2500 — consider additional DCA if thesis intact",
+      "action_suggested": "dca_opportunity",
+      "active": true
+    },
+    {
+      "id": "alert-002",
+      "asset": "ETH",
+      "type": "price_above",
+      "threshold_usd": 5500.00,
+      "threshold_pct": null,
+      "message": "ETH near target. Evaluate partial exit (25%).",
+      "action_suggested": "partial_exit",
+      "active": true
+    },
+    {
+      "id": "alert-003",
+      "asset": "portfolio",
+      "type": "stablecoin_below_pct",
+      "threshold_usd": null,
+      "threshold_pct": 10.0,
+      "message": "Stablecoin reserve below 10%. Rebalance.",
+      "action_suggested": "rebalance",
+      "active": true
+    }
+  ],
+  "tax_summary": {
+    "tax_year": 2026,
+    "jurisdiction": "LU",
+    "currency": "EUR",
+    "disclaimer": "This is an indicative summary only. Consult a licensed accountant for official tax filing.",
+    "realized_gains_usd": 1240.50,
+    "realized_losses_usd": -210.00,
+    "net_realized_usd": 1030.50,
+    "total_fees_usd": 87.30,
+    "taxable_events_count": 2,
+    "taxable_events": [
+      {
+        "date": "2026-02-20",
+        "type": "sell",
+        "asset": "ETH",
+        "amount": 0.3,
+        "buy_price_usd": 2100.00,
+        "sell_price_usd": 3070.00,
+        "gain_usd": 291.00,
+        "holding_days": 180
+      }
+    ],
+    "last_calculated": "2026-05-20"
+  },
+  "agent_handoffs": [
+    {
+      "id": "handoff-001",
+      "date": "2026-05-10T15:00:00Z",
+      "from_agent": "perplexity_computer",
+      "to_agent": "claude_opus",
+      "context_passed": "Aerodrome V2 smart contract security audit — LP contract review",
+      "result_summary": "No critical vulnerabilities. 2 minor warnings on access control patterns.",
+      "tags": ["defi", "audit", "aerodrome"]
+    }
+  ],
+  "pnl": {
+    "realized_usd": 1240.50,
+    "unrealized_usd": null,
+    "total_fees_paid_usd": 87.30,
+    "best_trade": {
+      "asset": "ETH",
+      "profit_usd": 890.00,
+      "date": "2026-02-20"
+    },
+    "worst_trade": {
+      "asset": "DEGEN",
+      "loss_usd": -210.00,
+      "date": "2025-11-04"
+    },
+    "last_calculated": "2026-05-20T09:00:00Z"
+  },
+  "watchlist": [
+    {
+      "asset": "SOL",
+      "chain": "solana",
+      "interest": "potential_entry",
+      "target_entry_usd": 120.00,
+      "max_allocation_pct": 5.0,
+      "thesis_draft": "Strong ecosystem growth. Meme coin flywheel brings liquidity. Risk: validator centralization.",
+      "conviction": "medium",
+      "note": "Wait for support around 120 before DCA"
+    }
+  ],
+  "strategy": {
+    "time_horizon": "long_term",
+    "dca_assets": ["ETH", "BTC"],
+    "dca_frequency": "monthly",
+    "max_single_asset_pct": 10,
+    "stablecoin_reserve_pct": 15,
+    "max_defi_exposure_pct": 30,
+    "rules": [
+      "Never invest more than 10% of portfolio in a single altcoin",
+      "Always keep 15% in stablecoins",
+      "DCA only on ETH and BTC during bear markets",
+      "Take 25% profits when a position doubles",
+      "Never chase a pump — entry only on pre-established plan",
+      "Always review thesis before any sell decision"
+    ]
+  },
+  "journal": [
+    {
+      "id": "note-001",
+      "date": "2026-05-15T21:00:00Z",
+      "title": "Monthly review — May 2026",
+      "content": "Portfolio +8% YTD. ETH thesis intact. Aerodrome position generating 18% APY. Considering increasing position if market consolidates.",
+      "tags": ["monthly_review", "eth"],
+      "sentiment": "optimistic"
+    }
+  ],
+  "history": {
+    "enabled": true,
+    "sessions": [
+      {
+        "session_id": "sess-001",
+        "date": "2026-05-15",
+        "agent": "perplexity_computer",
+        "summary": "Monthly review. Added defi-001. Revised ETH thesis. Realized PnL: +1240 USD YTD.",
+        "actions_taken": ["added defi-001", "updated thesis-001 review_notes", "updated pnl"],
+        "alerts_triggered": []
+      }
+    ]
+  }
+}
