@@ -1,6 +1,6 @@
 # .vaultd — Technical Specification
 
-**Version:** 1.1  
+**Version:** 1.2  
 **Status:** Production  
 **Date:** 2026-05-20  
 **License:** CC0 1.0 Universal  
@@ -12,13 +12,21 @@
 
 `.vaultd` is an open file format for portable, encrypted, local-first AI crypto portfolio context.
 
+Most crypto tools track **what** you hold. `.vaultd` tracks **why** you hold it — and enforces that every AI session remains honest to your past decisions and personal rules.
+
 It uses the `.klickd` v3.0 cryptographic envelope unchanged, with `domain: "crypto"` and an extended payload schema covering wallets, holdings, transactions, DeFi positions, NFTs, investment theses, risk event logs, personal strategy rules, tax summaries, and AI agent handoff logs.
+
+The file is a **portable investment constitution**: load it into GPT, Claude, Gemini, Grok, or any local model, and the agent operates under your rules — thesis-first, no invented prices, explicit write confirmation, mandatory session ritual.
 
 ### Core philosophy
 
 | Principle | Implementation |
 |---|---|
 | Zero server | AES-256-GCM encrypted, generated client-side only. Never transits any server. |
+| Thesis-first | Agent must state the investment thesis before any market commentary |
+| Rule-enforcing | Agent checks all `strategy.rules` before proposing any action |
+| No hallucinated prices | `current_price_usd: null` → agent asks user. Never invents or fetches silently. |
+| Explicit write-back | Agent presents JSON delta → user confirms → then writes. Never silently. |
 | Portable | Compatible with any AI model that reads JSON |
 | Privacy-first | Passphrase-derived key (Argon2id). No third party can decrypt. |
 | Open standard | CC0. No SDK required. No vendor lock-in. |
